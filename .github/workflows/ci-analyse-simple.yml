@@ -1,0 +1,60 @@
+name: CI.analyse-simple
+run-name: ${{ github.actor }} is running CI analyse simple
+on: 
+  workflow_dispatch:
+  push:
+    branches: [dev-main]
+jobs:
+  analyse-correctness:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/nordsecurity/nordvpn-linux/linter:1.0.0
+      options: --user root
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+      - name: Analyse correctness
+        run: |
+          git config --global --add safe.directory '*'
+          git version
+          export CI_COMMIT_TAG=3.16.2
+          export CI_PROJECT_DIR=.
+          export FEATURES='telio drop'
+          $CI_PROJECT_DIR/ci/lint.sh
+  analyse-scripts:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/nordsecurity/nordvpn-linux/shellcheck:1.0.0
+      options: --user root
+    steps:
+      - name: Prepare
+        run: |
+          apk update
+          apk upgrade
+          apk add git
+      - name: Check out repository code
+        uses: actions/checkout@v3
+      - name: Analyse scripts
+        run: |
+          git config --global --add safe.directory '*'
+          git version
+          export CI_COMMIT_TAG=3.16.2
+          export CI_PROJECT_DIR=.
+          export FEATURES='telio drop'
+          $CI_PROJECT_DIR/ci/shellcheck.sh
+  analyse-security:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/nordsecurity/nordvpn-linux/scanner:1.0.0
+      options: --user root
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+      - name: Analyse security
+        run: |
+          git config --global --add safe.directory '*'
+          git version
+          export CI_COMMIT_TAG=3.16.2
+          export CI_PROJECT_DIR=.
+          export FEATURES='telio drop'
+          $CI_PROJECT_DIR/ci/scan.sh

@@ -1,0 +1,72 @@
+name: CI
+run-name: ${{ github.actor }} is running CI
+on: 
+  workflow_dispatch:
+  push:
+    branches: [dev-main]
+jobs:
+  build-rust:
+    runs-on: ubuntu-latest    
+    container:
+      image: ghcr.io/nordsecurity/nordvpn-linux/ruster:1.0.0
+      options: --user root
+    steps:
+      - name: Prepare
+        run: |
+          apt update && apt upgrade -y
+          git version
+          which git
+          apt install -y libz-dev libssl-dev libcurl4-gnutls-dev libexpat1-dev gettext cmake gcc
+          mkdir tmp && cd tmp
+          curl -o git.tar.gz https://mirrors.edge.kernel.org/pub/software/scm/git/git-2.26.2.tar.gz
+          tar -zxf git.tar.gz
+          cd git-*
+          make prefix=/usr/local all
+          make prefix=/usr/local install
+          git version
+          which git
+          git config --global --add safe.directory '*'
+      - name: Check out repository code
+        uses: actions/checkout@v3
+      - name: Build-rust
+        run: |
+          ls -la
+          pwd
+          echo "~~~~~"
+          git config --global --add safe.directory '*'
+          git tag
+          echo "~~~RUN BUILD~~~"
+          export CI_PROJECT_DIR=.
+          export CI_COMMIT_TAG=3.16.2
+          export FEATURES='telio drop'
+          export ARCHS=amd64
+          export ARCH=amd64
+          $CI_PROJECT_DIR/build/foss/build.sh
+          echo "~~~RUN BUILD END~~~"
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with: 
+          name: build-rust-artifacts
+          path: $CI_PROJECT_DIR/bin/deps/foss/$ARCHS/latest
+
+  # tests:
+  #   runs-on: ubuntu-latest    
+  #   container:
+  #     image: ghcr.io/nordsecurity/nordvpn-linux/linter:1.0.0
+  #     options: --user root
+  #   steps:
+  #     - name: Check out repository code
+  #       uses: actions/checkout@v3
+  #     - name: Test
+  #       run: |
+  #         ls -la
+  #         pwd
+  #         echo "~~~~~"
+  #         git config --global --add safe.directory '*'
+  #         git tag
+  #         echo "~~~RUN LINTER~~~"
+  #         export CI_PROJECT_DIR=.
+  #         export CI_COMMIT_TAG=3.16.2
+  #         export FEATURES='telio drop'
+  #         ./ci/lint.sh
+  #         echo "~~~RUN LINTER END~~~"
