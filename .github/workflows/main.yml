@@ -1,0 +1,59 @@
+name: Main CI
+run-name: ${{ github.actor }} is running Main CI
+on: 
+  workflow_dispatch:
+  push:
+    branches: [dev-main]
+jobs:
+  build-rust:
+    runs-on: ubuntu-latest
+    needs: []
+    container:
+      image: ghcr.io/nordsecurity/nordvpn-linux/ruster:1.0.0
+      options: --user root
+    steps:
+      - name: Build rust binaries
+        run: |
+          echo "Build rust binaries"
+  test-cgo:
+    runs-on: ubuntu-latest
+    needs: [build-rust]
+    container:
+      image: ghcr.io/nordsecurity/nordvpn-linux/builder:1.0.0
+      options: --user root
+    steps:
+      - name: Test CGO
+        run: |
+          echo "Test CGO"
+  build-go:
+    runs-on: ubuntu-latest
+    needs: [test-cgo]
+    container:
+      image: ghcr.io/nordsecurity/nordvpn-linux/builder:1.0.0
+      options: --user root
+    steps:
+      - name: Test CGO
+        run: |
+          echo "Test CGO"
+      - name: Test GO
+        run: |
+          echo "Test GO"
+      - name: Build data
+        run: |
+          echo "Build data"
+      - name: Build go binaries
+        run: |
+          echo "Build go binaries"
+      - name: Build openvpn
+        run: |
+          echo "Build openvpn"
+  build-licenses:
+    runs-on: ubuntu-latest
+    needs: [build-go]
+    container:
+      image: ghcr.io/nordsecurity/nordvpn-linux/depender:1.0.0
+      options: --user root
+    steps:
+      - name: Build licenses
+        run: |
+          echo "Build licenses"
