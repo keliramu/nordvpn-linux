@@ -5,7 +5,5 @@ jobs:
     name: Example Job
     runs-on: ubuntu-latest
     steps:
-      - name: Clone Repository
-        uses: actions/checkout@v3
       - name: AAA
         run: echo AAA
