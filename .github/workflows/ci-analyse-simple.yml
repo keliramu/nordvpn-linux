@@ -1,9 +1,8 @@
 name: CI.analyse-simple
 run-name: ${{ github.actor }} is running CI analyse simple
-on: 
-  workflow_dispatch:
-  push:
-    branches: [dev-main]
+on: [workflow_dispatch]
+  # push:
+  #   branches: [dev,main]
 jobs:
   analyse-correctness:
     runs-on: ubuntu-latest
