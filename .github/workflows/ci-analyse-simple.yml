@@ -2,7 +2,7 @@ name: CI.analyse-simple
 run-name: ${{ github.actor }} is running CI analyse simple
 on:   
   push:
-    branches: [dev,main]
+    branches: [dev-main]
 jobs:
   analyse-correctness:
     runs-on: ubuntu-latest

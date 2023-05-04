@@ -1,5 +1,6 @@
 name: My First Manual Workflow
-on: [workflow_dispatch]
+on:
+  workflow_dispatch:
 jobs:
   example:
     name: Example Job
