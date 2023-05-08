@@ -16,12 +16,15 @@ excluded_categories="root,link,firewall,route,file"
 # In case 'full' was specified, do not exclude anything and run
 # everything
 if [ "${1:-""}" = "full" ]; then
-	# Apply moose patch in case compiling with moose
-	git apply "${CI_PROJECT_DIR}"/contrib/patches/add_moose.diff
-	function revert_moose_patch {
-		git apply -R "${CI_PROJECT_DIR}"/contrib/patches/add_moose.diff
-	}
-	trap revert_moose_patch EXIT
+	tags="${FEATURES:-"telio drop"}"
+	if [[ $tags == *"moose"* ]]; then 
+		# Apply moose patch in case compiling with moose
+		git apply "${CI_PROJECT_DIR}"/contrib/patches/add_moose.diff
+		function revert_moose_patch {
+			git apply -R "${CI_PROJECT_DIR}"/contrib/patches/add_moose.diff
+		}
+		trap revert_moose_patch EXIT
+	fi
 
 	excluded_packages="thisshouldneverexist"
 	excluded_categories="root,link"
